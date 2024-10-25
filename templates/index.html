@@ -81,96 +81,116 @@
       smooth: true // Enables smooth panning and zooming
     }).addTo(map);
 
+    // Helper function to return red/blue marker based on emergency status
+    function getMarkerIcon(isEmergency) {
+      const iconUrl = isEmergency
+        ? 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png'
+        : 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png';
+
+      return L.icon({
+        iconUrl: iconUrl,
+        iconSize: [25, 41], // Icon size
+        iconAnchor: [12, 41], // Anchor point
+        popupAnchor: [1, -34], // Popup point relative to icon
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        shadowSize: [41, 41]
+      });
+    }
+
     // Function to fetch and display data on the map
     async function updateMap(data) {
-      // Clear existing markers/circles
+      // Clear existing markers
       map.eachLayer(layer => {
-          if (layer instanceof L.Marker || layer instanceof L.Circle) {
-              map.removeLayer(layer);
-          }
+        if (layer instanceof L.Marker) {
+          map.removeLayer(layer);
+        }
       });
 
-      // Add markers and circles to the map
+      // Add markers based on data
       for (const [shipId, entries] of Object.entries(data)) {
-          const latestEntry = entries[entries.length - 1]; // Get latest entry
+        const latestEntry = entries[entries.length - 1]; // Latest entry for each ship
 
-          const marker = L.marker([latestEntry.lat, latestEntry.lon]).addTo(map)
-              .bindPopup(`<strong>${shipId}</strong><br>Lat: ${latestEntry.lat}, Lon: ${latestEntry.lon}<br>
-                          <button onclick="showPreviousData('${shipId}')">Show Previous Data</button`);
+        // Create marker with dynamic icon based on emergency status
+        const marker = L.marker([latestEntry.lat, latestEntry.lon], {
+          icon: getMarkerIcon(latestEntry.emergency)
+        }).addTo(map);
 
-          // Zoom in on double click
-          marker.on('dblclick', () => {
-              map.setView([latestEntry.lat, latestEntry.lon], 10); // Zoom level 10
-          });
+        marker.bindPopup(`
+          <strong>${shipId}</strong><br>
+          Lat: ${latestEntry.lat}, Lon: ${latestEntry.lon}<br>
+          <button onclick="showPreviousData('${shipId}')">Show Previous Data</button>
+        `);
 
-          if (latestEntry.emergency) {
-              L.circle([latestEntry.lat, latestEntry.lon], {
-                  radius: 50000,
-                  color: 'red',
-                  fillOpacity: 0.5 // semi-transparent red circle
-              }).addTo(map);
-          }
+        // Zoom in to the latest entry's location
+        map.setView([latestEntry.lat, latestEntry.lon], 10); // Change 10 to your desired zoom level
+
+        // Zoom in on double click
+        marker.on('dblclick', () => {
+          map.setView([latestEntry.lat, latestEntry.lon], 10); // Zoom level 10
+        });
       }
     }
 
-    // Function to show previous data in a new tab
     function showPreviousData(shipId) {
-      fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-          const previousEntries = data[shipId].filter(entry => entry.flag === 0);
-          let previousDataHtml = `<html><head><title>Previous Data for ${shipId}</title></head><body>`;
-          previousDataHtml += `<h1>Previous Data for ${shipId}</h1><br>`;
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      const previousEntries = data[shipId].slice(0, -1); // Get all entries except the latest one
+      let previousDataHtml = `<html><head><title>Previous Data for ${shipId}</title></head><body>`;
+      previousDataHtml += `<h1>Previous Data for ${shipId}</h1><br>`;
 
-          previousEntries.forEach(entry => {
-            previousDataHtml += `Lat: ${entry.lat}, Lon: ${entry.lon}<br>`;
-          });
+      previousEntries.forEach(entry => {
+        previousDataHtml += `<strong>Entry:</strong><br>`;
+        for (const [key, value] of Object.entries(entry)) {
+          previousDataHtml += `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}<br>`;
+        }
+        previousDataHtml += `<br>`; // Add spacing between entries
+      });
 
-          if (previousEntries.length === 0) {
-            previousDataHtml += 'No previous data available.';
-          }
+      if (previousEntries.length === 0) {
+        previousDataHtml += 'No previous data available.';
+      }
 
-          previousDataHtml += '</body></html>';
-          
-          const newTab = window.open();
-          newTab.document.write(previousDataHtml);
-          newTab.document.close();
-        });
-    }
+      previousDataHtml += '</body></html>';
 
+      const newTab = window.open();
+      newTab.document.write(previousDataHtml);
+      newTab.document.close();
+    });
+}
     // Handle file upload
     document.getElementById('upload-btn').addEventListener('click', async () => {
       const input = document.getElementById('upload-input');
       const file = input.files[0];
 
       if (!file) {
-          alert('Please select a file to upload.');
-          return;
+        alert('Please select a file to upload.');
+        return;
       }
 
       const formData = new FormData();
       formData.append('file', file);
 
       try {
-          const response = await fetch('/upload', {
-              method: 'POST',
-              body: formData
-          });
-          const result = await response.json();
-          alert(result.message);
-          // Update the map with the new data received
-          updateMap(result.data);
+        const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+
+        // Update the map with new data
+        await updateMap(result.data);
+        alert(result.message);
       } catch (error) {
-          console.error('Error uploading file:', error);
+        console.error('Error uploading file:', error);
+        alert('Error uploading file.');
       }
     });
 
-    // Trigger initial map update on page load
-    window.onload = async () => {
-      const response = await fetch(apiUrl);
-      const initialData = await response.json();
-      updateMap(initialData);
-    };
+    // Fetch and display initial data on page load
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => updateMap(data));
   </script>
 </body>
 </html>

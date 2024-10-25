@@ -8,15 +8,19 @@ upload_folder = 'uploads'
 
 # Ensure the upload folder exists
 os.makedirs(upload_folder, exist_ok=True)
+from datetime import datetime
 
-def update_json_with_new_data(ship_id, lat, lon, ship_type, emergency):
+def update_json_with_new_data(ship_id, lat, lon, emergency, additional_data):
     new_data = {
         'lat': lat,
         'lon': lon,
-        'type': ship_type,
         'emergency': emergency,
-        'flag': 1  # New data flag
+        'timestamp': datetime.utcnow().isoformat(),  # Save current timestamp in ISO format
+        'flag': 1,  # New data flag, can be removed if not using
     }
+
+    # Add any additional data fields
+    new_data.update(additional_data)
 
     # Load existing data
     with open(data_file_path, 'r+') as f:
@@ -36,18 +40,23 @@ def update_json_with_new_data(ship_id, lat, lon, ship_type, emergency):
         f.truncate()
 
 def process_file(file):
-    # Dummy processing logic
+    # Use the uploaded file's filename as the ship ID
     ship_id = os.path.splitext(file.filename)[0]  # Use filename (without extension) as ship ID
+    
+    # Dummy values for lat, lon, and emergency (replace with actual extraction logic)
     lat = 20.5  # Replace with extracted latitude
     lon = 78.5  # Replace with extracted longitude
-    ship_type = "Ship"  # Replace with actual type if available
     emergency = False  # Replace with actual emergency status if available
 
+    # Prepare additional data from the file (as a dictionary)
+    additional_data = {}  # Any additional data you want to include can be extracted here
+
     # Update JSON with the new data
-    update_json_with_new_data(ship_id, lat, lon, ship_type, emergency)
+    update_json_with_new_data(ship_id, lat, lon, emergency, additional_data)
 
     # Fetch and return updated data
-    return get_updated_data()
+    updated_data = get_updated_data()
+    return updated_data
 
 def get_updated_data():
     with open(data_file_path) as f:
@@ -57,27 +66,34 @@ def get_updated_data():
 @app.route('/')
 def index():
     return render_template('index.html')
-
 @app.route('/upload', methods=['POST'])
 def upload():
     if 'file' not in request.files:
-        return jsonify({'message': 'No file uploaded.'}), 400
+        return jsonify({'message': 'No file part'}), 400
 
     file = request.files['file']
-    
-    # Save the uploaded file
-    file_path = os.path.join(upload_folder, file.filename)
-    file.save(file_path)
-    
-    # Process the uploaded file and get updated data
+    if file.filename == '':
+        return jsonify({'message': 'No selected file'}), 400
+
+    # Define the common name for the uploaded file
+    common_file_name = 'latest_image.jpg'
+    common_file_path = os.path.join(upload_folder, common_file_name)
+
+    # Remove any existing file with the common name
+    if os.path.isfile(common_file_path):
+        os.remove(common_file_path)
+
+    # Save the new file with the common name
+    file.save(common_file_path)
+
+    # Process the uploaded file (custom logic for your case)
     updated_data = process_file(file)
+    
+    return jsonify({'message': 'File uploaded and processed successfully', 'data': updated_data})
 
-    return jsonify({'message': 'File uploaded and processed successfully.', 'data': updated_data}), 200
-
-@app.route('/api/data', methods=['GET'])
-def get_data():
-    with open(data_file_path) as f:
-        data = json.load(f)
+@app.route('/api/data')
+def api_data():
+    data = get_updated_data()
     return jsonify(data)
 
 if __name__ == '__main__':
