@@ -1,0 +1,43 @@
+{
+    "ship001": [
+        {
+            "lat": 20.1,
+            "lon": 78.1,
+            "type": "Cargo Ship",
+            "emergency": false,
+            "flag": 0
+        },
+        {
+            "lat": 20.2,
+            "lon": 78.2,
+            "type": "Cargo Ship",
+            "emergency": false,
+            "flag": 1
+        }
+    ],
+    "ship002": [
+        {
+            "lat": 20.3,
+            "lon": 78.3,
+            "type": "Fishing Boat",
+            "emergency": false,
+            "flag": 0
+        },
+        {
+            "lat": 20.4,
+            "lon": 78.4,
+            "type": "Fishing Boat",
+            "emergency": true,
+            "flag": 1
+        }
+    ],
+    "Reminder It's time for your workout! \ud83c\udfc3_\u2642\ufe0f 30 minutes of brisk walking. Tap to start!": [
+        {
+            "lat": 20.5,
+            "lon": 78.5,
+            "type": "Ship",
+            "emergency": false,
+            "flag": 1
+        }
+    ]
+}
