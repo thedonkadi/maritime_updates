@@ -4,7 +4,7 @@ from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, SystemMessage
 import os
 import pytesseract
-groq_api_key= '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'
+groq_api_key= ''
 
 def extract_text_from_image(image_path):
     try:
