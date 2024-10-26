@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify, render_template
 import json
 import os
 from datetime import datetime
+import random
+from navy_llm import process_image
 
 app = Flask(__name__)
 data_file_path = 'data.json'
@@ -9,39 +11,88 @@ upload_folder = 'uploads'
 
 # Ensure the upload folder exists
 os.makedirs(upload_folder, exist_ok=True)
-
+unknown_ship_i = 1
+unknown_ship_j = 1
 def update_json_with_new_data(ship_id, lat, lon, emergency, additional_data):
-    new_data = {
-        'lat': lat,
-        'lon': lon,
-        'emergency': emergency,
-        'timestamp': datetime.utcnow().isoformat(),
-        'flag': 1,
-    }
+    global unknown_ship_i , unknown_ship_j
+    data_type = type(lat)
+    if data_type == list():
+        n = min(len(lat),len(lon))
+        for i in range(n):
+            if ship_id == None:
+                ship_id = str(unknown_ship_j )
+                additional_data["name"] = ship_id
+                unknown_ship_j += 1
+            else:
+                ship_id = str(ship_id)
+            
+            new_data = {
+                'lat': lat,
+                'lon': lon,
+                'emergency': emergency,
+                'timestamp': datetime.utcnow().isoformat(),
+                'additional_data' : additional_data
+            }
 
-    new_data.update(additional_data)
 
-    with open(data_file_path, 'r+') as f:
-        data = json.load(f)
+            with open(data_file_path, 'r+') as f:
+                data = json.load(f)
 
-        if ship_id in data:
-            data[ship_id].append(new_data)
+                if ship_id in data:
+                    data[ship_id].append(new_data)
+                else:
+                    data[ship_id] = [new_data]
+
+                f.seek(0)
+                json.dump(data, f, indent=4)
+                f.truncate()
+    else:
+        if ship_id == None:
+            ship_id = str(unknown_ship_j)
+            additional_data["name"] = ship_id
+            unknown_ship_j += 1
         else:
-            data[ship_id] = [new_data]
+            ship_id = str(ship_id)
+        
+        new_data = {
+            'lat': lat,
+            'lon': lon,
+            'emergency': emergency,
+            'timestamp': datetime.utcnow().isoformat(),
+            'additional_data' : additional_data
+        }
 
-        f.seek(0)
-        json.dump(data, f, indent=4)
-        f.truncate()
 
-def process_file(file):
-    ship_id = os.path.splitext(file.filename)[0]
-    
-    # Dummy values for lat, lon, and emergency
-    lat = 20.5  # Replace with actual extraction logic
-    lon = 78.5  # Replace with actual extraction logic
-    emergency = False  # Replace with actual emergency status
+        with open(data_file_path, 'r+') as f:
+            data = json.load(f)
+
+            if ship_id in data:
+                data[ship_id].append(new_data)
+            else:
+                data[ship_id] = [new_data]
+
+            f.seek(0)
+            json.dump(data, f, indent=4)
+            f.truncate()
+
+def process_file(file_path):
+    process_image(file_path)
+    with open('extracted_vessel_data.json', 'r') as file:
+        data = json.load(file)
+
+    # Dummy processing logic
+    ship_id =  data['name'] # Use filename (without extension) as ship ID
+    lat = data['latitude']  # Replace with extracted latitude
+    lon =  data['longitude']  # Replace with extracted longitude
+    ship_type = data['vessel_type']  # Replace with actual type if available
+    emergency = data['threat_level']  # Replace with actual emergency status if available
 
     additional_data = {}
+
+    for key,value in data.items():
+        if key!= 'latitude' and key!= 'longitude' and key!= 'vessel_type' and key!= 'threat_level':
+            additional_data[key] = value
+    
     update_json_with_new_data(ship_id, lat, lon, emergency, additional_data)
 
     updated_data = get_updated_data()
@@ -73,7 +124,7 @@ def upload():
 
     file.save(common_file_path)
 
-    updated_data = process_file(file)
+    updated_data = process_file(common_file_path)
     
     return jsonify({'message': 'File uploaded and processed successfully', 'data': updated_data})
 

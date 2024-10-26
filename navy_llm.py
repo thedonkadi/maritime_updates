@@ -32,7 +32,7 @@ def analyze_text_with_model(extracted_text, model):
     Features to extract:
     1. Geographical information (latitude, longitude, heading, speed)
     2. Temporal data (time of sighting, date)
-    3. Vessel attributes (type, size, nationality, MLA)
+    3. Vessel attributes (name , type, size, nationality, MLA)
     4. Behavioral features (movement, threat level, proximity)
     5. Additional attributes (weather conditions, communications log)
 
@@ -41,6 +41,7 @@ def analyze_text_with_model(extracted_text, model):
     {
         "latitude": null,
         "longitude": null,
+        "name" : null,
         "heading": null,
         "speed": null,
         "time_of_sighting": null,
