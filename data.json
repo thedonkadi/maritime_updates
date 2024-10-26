@@ -102,5 +102,47 @@
                 "communications_log": null
             }
         }
+    ],
+    "Lakshadweep Anti-Submarine Warfare Zone": [
+        {
+            "lat": null,
+            "lon": null,
+            "emergency": null,
+            "timestamp": "2024-10-26T11:22:04.309872",
+            "additional_data": {
+                "name": "Lakshadweep Anti-Submarine Warfare Zone",
+                "heading": null,
+                "speed": null,
+                "time_of_sighting": null,
+                "date": null,
+                "size": null,
+                "nationality": null,
+                "MLA": null,
+                "movement": null,
+                "proximity": null,
+                "weather_conditions": null,
+                "communications_log": null
+            }
+        },
+        {
+            "lat": 10.0,
+            "lon": 71.0,
+            "emergency": null,
+            "timestamp": "2024-10-26T11:22:44.834986",
+            "additional_data": {
+                "name": "Lakshadweep Anti-Submarine Warfare Zone",
+                "heading": null,
+                "speed": null,
+                "time_of_sighting": null,
+                "date": null,
+                "size": null,
+                "nationality": null,
+                "MLA": null,
+                "movement": null,
+                "proximity": null,
+                "weather_conditions": null,
+                "communications_log": null
+            }
+        }
     ]
 }

@@ -111,7 +111,7 @@
 
   <div class="logo-section">
     <div class="logo-placeholder">
-      <img src="static\Indian_Navy_Crest.png" alt="Indian Naval Ensign"> <!-- Updated image path -->
+      <img src="static/Indian_Navy_Crest.png" alt="Indian Naval Ensign"> <!-- Updated image path -->
     </div>
     <div class="glowing-heading">Indian Maritime Awareness</div>
   </div>
@@ -127,11 +127,6 @@
 
   <div id="map"></div>
 
-  <div class="photo-gallery">
-    <img src="/static/images/ins_vikrant.jpg" alt="INS Vikrant"> <!-- Optional -->
-    <img src="/static/images/ins_kolkata.jpg" alt="INS Kolkata"> <!-- Optional -->
-    <img src="/static/images/mig_29k.jpg" alt="MIG-29K"> <!-- Optional -->
-  </div>
 
   <script>
     const apiUrl = '/api/data';
@@ -158,42 +153,20 @@
       });
     }
 
-    async function updateMap(data) {
-      map.eachLayer(layer => {
-        if (layer instanceof L.Marker) map.removeLayer(layer);
-      });
-
-      for (const [shipId, entries] of Object.entries(data)) {
-        const latestEntry = entries[entries.length - 1];
-        const marker = L.marker([latestEntry.lat, latestEntry.lon], {
-          icon: getMarkerIcon(latestEntry.emergency),
-        }).addTo(map);
-
-        marker.bindPopup(`
-          <strong>${shipId}</strong><br>
-          Lat: ${latestEntry.lat}, Lon: ${latestEntry.lon}<br>
-          <button onclick="showPreviousData('${shipId}')">Show Previous Data</button>
-          <button onclick="viewRoute('${shipId}')">View Route</button>
-        `);
-
-        map.setView([latestEntry.lat, latestEntry.lon], 10);
-        marker.on('dblclick', () => map.setView([latestEntry.lat, latestEntry.lon], 10));
-      }
-    }
-
     function showPreviousData(shipId) {
       fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-          const previousEntries = data[shipId].slice(0, -1);
+          const previousEntries = data[shipId];
+          const previousData = previousEntries.slice(0, -1); // Exclude the last entry
           let html = `<h1>Previous Data for ${shipId}</h1><br>`;
-          previousEntries.forEach(entry => {
+          previousData.forEach(entry => {
             for (const [key, value] of Object.entries(entry)) {
               html += `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}<br>`;
             }
             html += `<br>`;
           });
-          if (previousEntries.length === 0) html += 'No previous data available.';
+          if (previousData.length === 0) html += 'No previous data available.';
           const newTab = window.open();
           newTab.document.write(html);
         });
@@ -203,25 +176,68 @@
       window.open(`route.html?ship_id=${shipId}`, '_blank');
     }
 
-    document.getElementById('upload-btn').addEventListener('click', async () => {
-      const input = document.getElementById('upload-input');
-      const file = input.files[0];
-      if (!file) return alert('Please select a file to upload.');
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      try {
-        const response = await fetch('/upload', { method: 'POST', body: formData });
-        const result = await response.json();
-        await updateMap(result.data);
-        alert(result.message);
-      } catch {
-        alert('Error uploading file.');
-      }
+    async function updateMap(data) {
+    // Remove all existing markers from the map
+    map.eachLayer(layer => {
+        if (layer instanceof L.Marker) map.removeLayer(layer);
     });
 
-    fetch(apiUrl).then(response => response.json()).then(data => updateMap(data));
+    let latestLat, latestLon;
+    let latestTimestamp = new Date(0); // Start with the earliest date
+
+    // Iterate over each ship's data
+    for (const [shipId, entries] of Object.entries(data)) {
+        const latestEntry = entries[entries.length - 1]; // Get the latest entry for the ship
+        const entryTimestamp = new Date(latestEntry.timestamp);
+
+        // Check if this entry is the most recent one
+        if (entryTimestamp > latestTimestamp) {
+            latestTimestamp = entryTimestamp;
+            latestLat = latestEntry.lat;
+            latestLon = latestEntry.lon;
+        }
+
+        // Create a marker for the latest entry of each ship
+        const marker = L.marker([latestEntry.lat, latestEntry.lon], {
+            icon: getMarkerIcon(latestEntry.emergency),
+        }).addTo(map);
+
+        marker.bindPopup(`
+            <strong>${shipId}</strong><br>
+            Lat: ${latestEntry.lat}, Lon: ${latestEntry.lon}<br>
+            <button onclick="showPreviousData('${shipId}')">Show Previous Data</button>
+            <button onclick="viewRoute('${shipId}')">View Route</button>
+        `);
+    }
+
+    // After processing all entries, set the view to the latest ship's location
+    if (latestLat !== undefined && latestLon !== undefined) {
+        map.setView([latestLat, latestLon], 10); // Zoom to the latest location
+    } else {
+        console.warn('No latest location found to zoom in.');
+    }
+}
+
+// Update the map after uploading a new file
+document.getElementById('upload-btn').addEventListener('click', async () => {
+    const input = document.getElementById('upload-input');
+    const file = input.files[0];
+    if (!file) return alert('Please select a file to upload.');
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await fetch('/upload', { method: 'POST', body: formData });
+        const result = await response.json();
+        await updateMap(result.data); // Update the map with new data
+        alert(result.message);
+    } catch {
+        alert('Error uploading file.');
+    }
+});
+
+    fetch(apiUrl).then(response => response.json()).then(data => updateMap(data)); // Initial map load
   </script>
 </body>
 </html>

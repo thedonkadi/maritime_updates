@@ -10,16 +10,23 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 0;
       height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
+      background-color: #f0f4f8; /* Light background for better contrast */
     }
     
-    h1 {
+    header {
+      background-color: #002147; /* Navy color for header */
+      color: white;
       text-align: center;
-      margin-bottom: 20px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      margin: 0;
     }
 
     #map {
@@ -29,11 +36,27 @@
       border-radius: 8px;
       margin-top: 10px;
     }
+
+    footer {
+      background-color: #002147;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
+    }
   </style>
 </head>
 <body>
-  <h1>Route for <span id="shipId"></span></h1>
+  <header>
+    <h1>Route for <span id="shipId"></span></h1>
+  </header>
   <div id="map"></div>
+  <footer>
+    <p>&copy; 2024 Maritime Updates</p>
+  </footer>
 
   <script>
     const map = L.map('map').setView([20, 78], 5); // Center on India
