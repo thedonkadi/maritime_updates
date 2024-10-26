@@ -127,11 +127,6 @@
 
   <div id="map"></div>
 
-  <div class="photo-gallery">
-    <img src="/static/images/ins_vikrant.jpg" alt="INS Vikrant"> <!-- Optional -->
-    <img src="/static/images/ins_kolkata.jpg" alt="INS Kolkata"> <!-- Optional -->
-    <img src="/static/images/mig_29k.jpg" alt="MIG-29K"> <!-- Optional -->
-  </div>
 
   <script>
     const apiUrl = '/api/data';
@@ -162,15 +157,16 @@
       fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-          const previousEntries = data[shipId].slice(0, -1);
+          const previousEntries = data[shipId];
+          const previousData = previousEntries.slice(0, -1); // Exclude the last entry
           let html = `<h1>Previous Data for ${shipId}</h1><br>`;
-          previousEntries.forEach(entry => {
+          previousData.forEach(entry => {
             for (const [key, value] of Object.entries(entry)) {
               html += `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}<br>`;
             }
             html += `<br>`;
           });
-          if (previousEntries.length === 0) html += 'No previous data available.';
+          if (previousData.length === 0) html += 'No previous data available.';
           const newTab = window.open();
           newTab.document.write(html);
         });

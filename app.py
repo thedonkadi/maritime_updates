@@ -16,9 +16,8 @@ def update_json_with_new_data(ship_id, lat, lon, emergency, additional_data):
         'lon': lon,
         'emergency': emergency,
         'timestamp': datetime.utcnow().isoformat(),
+        'additional_data': additional_data  # Accepts any message or data
     }
-
-    new_data.update(additional_data)
 
     with open(data_file_path, 'r+') as f:
         data = json.load(f)
@@ -40,7 +39,9 @@ def process_file(file):
     lon = 78.5  # Replace with actual extraction logic
     emergency = False  # Replace with actual emergency status
 
-    additional_data = {}
+    # Extract additional_data from somewhere, e.g., request.form or similar
+    additional_data = request.form.get('additional_data', '')  # Example: could be user input or a message
+
     update_json_with_new_data(ship_id, lat, lon, emergency, additional_data)
 
     updated_data = get_updated_data()
