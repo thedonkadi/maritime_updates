@@ -1,0 +1,46 @@
+{
+    "ship1": [
+        {
+            "lat": 20.5,
+            "lon": 78.5,
+            "emergency": false,
+            "flag": 1,
+            "type": "Cargo",
+            "timestamp": "2024-10-25T10:00:00Z"
+        },
+        {
+            "lat": 19.5,
+            "lon": 77.5,
+            "emergency": true,
+            "flag": 0,
+            "type": "Cargo",
+            "timestamp": "2024-10-24T10:00:00Z"
+        }
+    ],
+    "ship2": [
+        {
+            "lat": 21.5,
+            "lon": 79.5,
+            "emergency": false,
+            "flag": 1,
+            "type": "Tanker",
+            "timestamp": "2024-10-25T10:05:00Z"
+        }
+    ],
+    "flow": [
+        {
+            "lat": 20.5,
+            "lon": 78.5,
+            "emergency": false
+        }
+    ],
+    "1": [
+        {
+            "lat": 13.25,
+            "lon": -71.5,
+            "type": "Cargo vessel",
+            "emergency": null,
+            "flag": 1
+        }
+    ]
+}
