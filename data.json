@@ -59,22 +59,12 @@
             "timestamp": "2024-10-03T10:00:00Z"
         }
     ],
-    "Reminder It's time for your workout! \ud83c\udfc3_\u2642\ufe0f 30 minutes of brisk walking. Tap to start!": [
+    "Gemini_Generated_Image_vuaapuvuaapuvuaa": [
         {
             "lat": 20.5,
             "lon": 78.5,
             "emergency": false,
-            "timestamp": "2024-10-25T19:31:20.717140",
-            "flag": 1
-        }
-    ],
-    "thumb (1)": [
-        {
-            "lat": 20.5,
-            "lon": 78.5,
-            "emergency": false,
-            "timestamp": "2024-10-25T19:31:55.882988",
-            "flag": 1
+            "timestamp": "2024-10-26T10:16:33.975523"
         }
     ]
 }

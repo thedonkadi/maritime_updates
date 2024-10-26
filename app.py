@@ -16,7 +16,6 @@ def update_json_with_new_data(ship_id, lat, lon, emergency, additional_data):
         'lon': lon,
         'emergency': emergency,
         'timestamp': datetime.utcnow().isoformat(),
-        'flag': 1,
     }
 
     new_data.update(additional_data)
