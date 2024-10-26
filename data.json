@@ -1,37 +1,80 @@
 {
-    "ship1": [
+    "ship_1": [
         {
-            "lat": 20.5,
-            "lon": 78.5,
+            "lat": 28.6129,
+            "lon": 77.2295,
             "emergency": false,
-            "flag": 1,
-            "type": "Cargo",
-            "timestamp": "2024-10-25T10:00:00Z"
+            "timestamp": "2024-10-01T10:00:00Z"
         },
         {
-            "lat": 19.5,
-            "lon": 77.5,
-            "emergency": true,
-            "flag": 0,
-            "type": "Cargo",
-            "timestamp": "2024-10-24T10:00:00Z"
-        }
-    ],
-    "ship2": [
-        {
-            "lat": 21.5,
-            "lon": 79.5,
+            "lat": 28.7041,
+            "lon": 77.1025,
             "emergency": false,
-            "flag": 1,
-            "type": "Tanker",
-            "timestamp": "2024-10-25T10:05:00Z"
+            "timestamp": "2024-10-02T10:00:00Z"
+        },
+        {
+            "lat": 28.5355,
+            "lon": 77.391,
+            "emergency": true,
+            "timestamp": "2024-10-03T10:00:00Z"
         }
     ],
-    "flow": [
+    "ship_2": [
+        {
+            "lat": 22.5726,
+            "lon": 88.3639,
+            "emergency": false,
+            "timestamp": "2024-10-01T10:00:00Z"
+        },
+        {
+            "lat": 22.3072,
+            "lon": 70.8022,
+            "emergency": true,
+            "timestamp": "2024-10-02T10:00:00Z"
+        },
+        {
+            "lat": 22.5726,
+            "lon": 88.3639,
+            "emergency": false,
+            "timestamp": "2024-10-03T10:00:00Z"
+        }
+    ],
+    "ship_3": [
+        {
+            "lat": 13.0827,
+            "lon": 80.2707,
+            "emergency": false,
+            "timestamp": "2024-10-01T10:00:00Z"
+        },
+        {
+            "lat": 13.0358,
+            "lon": 80.2498,
+            "emergency": true,
+            "timestamp": "2024-10-02T10:00:00Z"
+        },
+        {
+            "lat": 13.0674,
+            "lon": 80.2376,
+            "emergency": false,
+            "timestamp": "2024-10-03T10:00:00Z"
+        }
+    ],
+    "Reminder It's time for your workout! \ud83c\udfc3_\u2642\ufe0f 30 minutes of brisk walking. Tap to start!": [
         {
             "lat": 20.5,
             "lon": 78.5,
-            "emergency": false
+            "emergency": false,
+            "timestamp": "2024-10-25T19:31:20.717140",
+            "flag": 1
+        }
+    ],
+    "thumb (1)": [
+        {
+            "lat": 20.5,
+            "lon": 78.5,
+            "emergency": false,
+            "timestamp": "2024-10-25T19:31:55.882988",
+            "flag": 1
         }
     ]
 }
